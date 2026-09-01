@@ -164,10 +164,14 @@ actually exists right now. Build these in the Scheduling engine phase.
   see Graph model.
 - `route_service.get_existing_route_edges(engine) -> dict[route_id, set[(from_stop, to_stop)]]` —
   **implemented**. Directed consecutive-stop-pairs per ACTIVE route, from `route_points`.
-- `route_service.generate_candidates(G, engine, origin_stop_id, destination_stop_id, k=3) -> list[dict]` —
-  **implemented**. Uses `nx.shortest_simple_paths` (k-shortest by
-  `travel_time_min`) to propose up to `k` candidate paths for a new
-  corridor. Per candidate: `distance_km`/`travel_time_min` (summed edge
+- `route_service.generate_candidates(G, engine, origin_stop_id, destination_stop_id, k=3, pool_size=None) -> list[dict]` —
+  **implemented**. Uses `nx.shortest_simple_paths` (shortest-by
+  `travel_time_min`) to search a wider pool of raw paths first
+  (`pool_size`, defaults to `max(k*2, 8)`) — the first `k` raw paths alone
+  tend to be near-duplicates of the single fastest route (minor detours
+  around the same corridor), so scoring only `k` barely explores the
+  tradeoff space. All `pool_size` paths are scored, then only the top `k`
+  by `route_score` are returned. Per candidate: `distance_km`/`travel_time_min` (summed edge
   weights), `overlap_pct` (% of the candidate's edges that already exist
   in some ACTIVE route's edge set), `coverage_gain_pct` (% of the
   candidate's stops not already served by any ACTIVE route),

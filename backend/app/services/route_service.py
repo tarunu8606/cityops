@@ -39,8 +39,20 @@ def _overlap_severity(overlap_pct: float) -> str:
 
 
 def generate_candidates(
-    G: nx.DiGraph, engine, origin_stop_id: int, destination_stop_id: int, k: int = 3
+    G: nx.DiGraph,
+    engine,
+    origin_stop_id: int,
+    destination_stop_id: int,
+    k: int = 3,
+    pool_size: int | None = None,
 ) -> list[dict]:
+    # Search a wider pool of raw shortest_simple_paths than we return: the
+    # first few are near-duplicates of the single fastest route (same
+    # corridor, minor detours), so scoring only k of them barely explores
+    # the tradeoff space. Score a bigger pool, then keep the top k.
+    if pool_size is None:
+        pool_size = max(k * 2, 8)
+
     route_edges = get_existing_route_edges(engine)
     all_active_edges: set[tuple[int, int]] = set()
     all_served_stops: set[int] = set()
@@ -55,7 +67,7 @@ def generate_candidates(
     )
 
     candidates = []
-    for path in islice(paths, k):
+    for path in islice(paths, pool_size):
         path_edges = [(path[i], path[i + 1]) for i in range(len(path) - 1)]
 
         distance_km = sum(G[u][v]["distance_km"] for u, v in path_edges)
@@ -87,6 +99,7 @@ def generate_candidates(
         )
 
     candidates.sort(key=lambda c: c["route_score"], reverse=True)
+    candidates = candidates[:k]
     for rank, c in enumerate(candidates, start=1):
         c["rank"] = rank
         c["is_recommended"] = rank == 1
