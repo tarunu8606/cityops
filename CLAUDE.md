@@ -236,7 +236,9 @@ Agent:
 origin_stop_id, destination_stop_id)` calls `route_service.generate_candidates`
 (the tool call — the agent never computes distance/overlap/coverage/score
 itself) and sends the resulting candidate list to an LLM (Groq's free API,
-OpenAI-compatible SDK, model `llama-3.3-70b-versatile`) asking only for a
+OpenAI-compatible SDK, model `openai/gpt-oss-120b` — `llama-3.3-70b-versatile`
+was decommissioned on Groq's API, confirmed via `client.models.list()`;
+`gpt-oss-120b` was picked from the current catalog for output quality) asking only for a
 1–2 sentence plain-English justification of the deterministic pick — the
 LLM is never asked to choose or calculate anything, only to explain
 `is_recommended`. Reads `GROQ_API_KEY` from `backend/.env` (gitignored;
