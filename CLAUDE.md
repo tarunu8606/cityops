@@ -61,11 +61,17 @@ backend/
       graph_service.py        # build_graph(engine) -> networkx.DiGraph
       route_service.py        # get_existing_route_edges(), generate_candidates()
       (validation_service.py, scheduling_service.py — not built yet)
-    (routers/, agents/, main.py, models.py, schemas.py — not built yet,
-     will be added back once the API layer is rebuilt against this schema)
+    agents/
+      route_agent.py          # run_route_agent(): wraps generate_candidates(),
+                               # asks an LLM to justify the deterministic pick
+      (scheduler_agent.py, tools.py — not built yet)
+    (routers/, main.py, models.py, schemas.py — not built yet, will be
+     added back once the API layer is rebuilt against this schema)
   test_graph.py               # verification script for graph_service
   test_routes.py              # verification script for route_service
+  test_route_agent.py         # verification script for route_agent
   requirements.txt
+  .env.example                # copy to .env locally, fill in GROQ_API_KEY (gitignored)
 frontend/                     # not started
 CLAUDE.md
 KICKOFF_PROMPT.md
@@ -226,7 +232,40 @@ Agent:
 
 ## Agent & tool contracts
 
-**Status: not built yet.** Tools exposed to the agent (thin wrappers in
+**`route_agent.py` — implemented.** `run_route_agent(G, engine, scenario_id,
+origin_stop_id, destination_stop_id)` calls `route_service.generate_candidates`
+(the tool call — the agent never computes distance/overlap/coverage/score
+itself) and sends the resulting candidate list to an LLM (Groq's free API,
+OpenAI-compatible SDK, model `llama-3.3-70b-versatile`) asking only for a
+1–2 sentence plain-English justification of the deterministic pick — the
+LLM is never asked to choose or calculate anything, only to explain
+`is_recommended`. Reads `GROQ_API_KEY` from `backend/.env` (gitignored;
+copy `.env.example` and fill in a free key). If the LLM call fails for any
+reason (missing key, network, rate limit), falls back to a templated
+reasoning string built from the same numbers — `status` stays `"success"`
+either way, since route selection is already correct before the LLM step
+runs; the LLM only explains it. Returns:
+```json
+{
+  "status": "success",
+  "scenario_id": 1,
+  "origin": "Gandhipuram",
+  "destination": "Neelambur",
+  "candidates": [ /* generate_candidates() output, each with an added candidate_code */ ],
+  "agent_recommendation": {
+    "candidate_code": "SC1-R1",
+    "reasoning": "..."
+  }
+}
+```
+`candidate_code` (e.g. `SC1-R1`) is synthesized in `route_agent.py` as
+`SC{scenario_id}-R{rank}` — the seeded `route_candidates` table has its own
+codes (`CBE01-A` etc.) for the hand-authored demo rows, but these are
+freshly generated candidates that aren't persisted to that table, so they
+get their own scheme. Verified in `test_route_agent.py` against both seed
+scenarios.
+
+**Scheduling agent — not built yet.** Tools exposed to the agent (thin wrappers in
 `agents/tools.py` around the service functions, JSON in/out, no side
 effects except the ones explicitly listed):
 - `get_available_buses(start_time, end_time) -> [bus]`
@@ -270,7 +309,10 @@ it should be able to re-derive these same conflicts from `duties` directly.
 4. **Fallback** — hardening the deterministic scheduler so it always
    returns a usable result (edge cases: no available bus, no available
    crew, all conflicts).
-5. **Agents** — `agents/tools.py`, `agents/scheduler_agent.py`, `/agent/schedule`.
+5. **Agents** — `agents/route_agent.py` **done** (LLM justifies the
+   deterministic route pick; verified in `test_route_agent.py`). Still to
+   do: `agents/tools.py`, `agents/scheduler_agent.py`, `/agent/schedule`
+   (the crew/bus scheduling agent, separate from route_agent).
 6. **Frontend** — plain HTML/JS views for routes/stops map (list, not
    literal map, unless time allows), duty table, conflict list, "generate
    schedule" trigger.

@@ -2,3 +2,5 @@ fastapi
 sqlalchemy
 psycopg2-binary
 networkx
+openai
+python-dotenv
