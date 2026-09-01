@@ -38,7 +38,12 @@ state plus any flagged conflicts.
   duplicate corridor), 10 routes, buses, crew, duties, etc.
 - Route graph: NetworkX `DiGraph`, built in-memory from `stops` +
   `road_segments` via `graph_service.build_graph(engine)`.
-- Frontend: plain HTML/CSS/JS (fetch calls), no build step — not started yet.
+- Frontend: Next.js (App Router) + TypeScript + Tailwind CSS v4, MapLibre GL
+  JS for the map view. Deviates from the originally-planned "plain HTML/JS,
+  no build step" — the map view needed real interactive map rendering
+  (MapLibre) which is much easier wired through a component framework;
+  Next.js's dev server/HMR loop is still fast enough not to slow the
+  hackathon pace down. See Frontend section below.
 - Agent: Claude via the Anthropic API, tool-calling against wrapped service
   functions (see Agent & Tool Contracts) — not started yet.
 
@@ -72,7 +77,14 @@ backend/
   test_route_agent.py         # verification script for route_agent
   requirements.txt
   .env.example                # copy to .env locally, fill in GROQ_API_KEY (gitignored)
-frontend/                     # not started
+frontend/                     # Next.js App Router, TypeScript, Tailwind v4
+  app/
+    map/page.tsx               # the one screen built so far — see Frontend section
+    page.tsx, layout.tsx, globals.css   # create-next-app defaults, untouched
+  public/
+    mock/scenario.json          # sample route_agent output (hand-written, matches
+    mock/stops.json             # the real contract) + stop id -> {name,lat,lon} lookup
+    maplibre/                   # committed worker-chunk workaround, see Frontend section
 CLAUDE.md
 KICKOFF_PROMPT.md
 ```
@@ -295,6 +307,40 @@ pre-seeded conflict rows (including a `REST_VIOLATION` and a
 `BUS_DOUBLE_BOOKING`) for demo purposes — once `validation_service` exists
 it should be able to re-derive these same conflicts from `duties` directly.
 
+## Frontend
+
+**Status: one screen built** — `frontend/app/map/page.tsx`, a single
+client-rendered page (no navigation shell yet). Renders a MapLibre map
+(style `https://tiles.openfreemap.org/styles/positron`, no API key needed)
+centered on Coimbatore, drawing each candidate route from
+`route_agent`-shaped scenario data as a line (recommended = teal `#0E7A85`
+width 5 on top, others = muted gray `#94A3B8` width 3 dashed underneath),
+plus a sidebar with a card per candidate and an "AI Insight" box showing
+`agent_recommendation.reasoning`. Clicking a card brings that route to
+front and highlights it; other lines dim.
+
+**Data is mocked, not live**: `public/mock/scenario.json` and
+`public/mock/stops.json` are hand-written but shaped exactly like
+`route_agent.run_route_agent()`'s real return value (see Agent & tool
+contracts) and `stops` table rows, respectively — there's no API layer yet
+for the frontend to call (see Phase plan), so the page fetches these two
+static files instead. When `/agent/schedule`-equivalent route endpoints
+exist, swap the two `fetch("/mock/...")` calls in `page.tsx` for real API
+calls; the shape shouldn't need to change.
+
+**Known gotcha — MapLibre v6 + Next.js/webpack:** MapLibre loads its
+tile-parsing worker as a separate ESM chunk at runtime
+(`maplibre-gl-worker.mjs`, which itself imports `maplibre-gl-shared.mjs`).
+Next's webpack build doesn't resolve that chunk automatically — the map
+silently never finishes loading (no console error, no failed network
+request, just a blank canvas with no tiles). Fixed by calling
+`maplibregl.setWorkerUrl("/maplibre/maplibre-gl-worker.mjs")` before
+creating the `Map`, pointing at a straight copy of those two files
+committed under `public/maplibre/` (see the README there for how to
+re-sync them if `maplibre-gl` is upgraded). Confirmed via an isolated
+static-HTML repro before landing this fix — worth knowing if a future
+`npm update` on `maplibre-gl` brings back a blank map.
+
 ## Phase plan
 
 1. **Foundation** — ~~backend skeleton, DB schema, seed data, basic CRUD
@@ -315,15 +361,21 @@ it should be able to re-derive these same conflicts from `duties` directly.
    deterministic route pick; verified in `test_route_agent.py`). Still to
    do: `agents/tools.py`, `agents/scheduler_agent.py`, `/agent/schedule`
    (the crew/bus scheduling agent, separate from route_agent).
-6. **Frontend** — plain HTML/JS views for routes/stops map (list, not
-   literal map, unless time allows), duty table, conflict list, "generate
-   schedule" trigger.
+6. **Frontend** — map view **started**: `app/map/page.tsx` renders real
+   candidate routes on a real Coimbatore basemap against mock data shaped
+   like `route_agent`'s output (see Frontend section) — built ahead of
+   phases 3/4 and the rest of phase 5 on explicit direction, out of the
+   "work strictly in order" sequence below. Still to do: duty table,
+   conflict list, "generate schedule" trigger, navigation shell.
 7. **Integration** — wire frontend to all endpoints, end-to-end demo path.
+   The map page's two `fetch("/mock/...")` calls are the known seam to
+   swap for real API calls once they exist.
 8. **Demo polish** — seed data tuning, error states, README run instructions.
 
-Work strictly in this order. Do not start agents or frontend before the
-deterministic backend (route overlap, rest validation, conflict detection)
-is built and tested.
+Generally work in this order — deterministic backend (route overlap, rest
+validation, conflict detection) before agents or frontend — unless
+explicitly directed otherwise for a specific piece, as with the map view
+above.
 
 ## Run instructions
 
@@ -361,3 +413,14 @@ Shortest path 1 -> 22 (by travel time): Gandhipuram -> Coimbatore Junction -> Ra
 `DATABASE_URL` env var overrides the default connection string
 (`postgresql://postgres:cityops123@localhost:5433/cityops`) if needed.
 `backend/.venv/` is gitignored — each teammate creates their own.
+
+Frontend (from repo root):
+
+```
+cd frontend
+npm install
+npm run dev
+```
+
+Then visit `http://localhost:3000/map`. `frontend/node_modules/` and
+`.next/` are gitignored per the standard Next.js `.gitignore`.
