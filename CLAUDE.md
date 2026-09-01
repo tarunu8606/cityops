@@ -197,4 +197,24 @@ is built and tested.
 
 ## Run instructions
 
-_(Filled in at the end of Phase 1, once the backend actually runs.)_
+Backend (from repo root):
+
+```
+cd backend
+python -m venv .venv
+./.venv/Scripts/pip install -r requirements.txt   # Windows; use .venv/bin/pip on macOS/Linux
+./.venv/Scripts/python -m app.seed                # populates backend/cityops.db, safe to re-run (skips if already seeded)
+./.venv/Scripts/python -m uvicorn app.main:app --reload --port 8000
+```
+
+Then visit `http://127.0.0.1:8000/docs` for interactive API docs, or:
+
+```
+curl http://127.0.0.1:8000/health
+curl http://127.0.0.1:8000/stops
+curl http://127.0.0.1:8000/routes
+curl http://127.0.0.1:8000/trips
+```
+
+`backend/cityops.db` and `backend/.venv/` are gitignored — each teammate seeds
+their own local DB.
