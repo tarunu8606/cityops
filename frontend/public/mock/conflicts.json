@@ -1,0 +1,80 @@
+{
+  "status": "success",
+  "proposed_actions": [
+    {
+      "route_id": 3,
+      "crew_id": 4,
+      "bus_id": 3,
+      "assignment_mode": "LINKED",
+      "resolution_type": "RESERVE_CREW",
+      "resolution_status": "PROPOSED",
+      "attempt_number": 1,
+      "ai_reasoning": "Reassigned Duty 3 on Route 3 to available reserve driver Dinesh (ID 4) who is qualified for route CBE03, resolving crew rest violation and duty overlap for Crew 3."
+    },
+    {
+      "route_id": 7,
+      "crew_id": 11,
+      "bus_id": 5,
+      "assignment_mode": "LINKED",
+      "resolution_type": "NORMAL_ASSIGNMENT",
+      "resolution_status": "PROPOSED",
+      "attempt_number": 1,
+      "ai_reasoning": "Reassigned Duty 7 on Route 7 to available Bus 5 (TN38AB1005), resolving bus double-booking on Bus 10."
+    },
+    {
+      "route_id": 5,
+      "crew_id": 2,
+      "bus_id": 7,
+      "assignment_mode": "LINKED",
+      "resolution_type": "RESERVE_CREW",
+      "resolution_status": "PROPOSED",
+      "attempt_number": 1,
+      "ai_reasoning": "Reassigned Duty 5 on Route 5 to available driver Bala (ID 2) who holds a HEAVY_MOTOR license and CBE05 qualification, resolving qualification failure."
+    },
+    {
+      "route_id": 9,
+      "crew_id": 10,
+      "bus_id": 12,
+      "assignment_mode": "LINKED",
+      "resolution_type": "RESERVE_CREW",
+      "resolution_status": "PROPOSED",
+      "attempt_number": 1,
+      "ai_reasoning": "Assigned unstaffed relief Duty 9 on Route 9 to available reserve driver Jagan (ID 10) qualified for route CBE09."
+    }
+  ],
+  "unresolved_escalations": [
+    {
+      "type": "ROUTE_OVERLAP",
+      "severity": "MEDIUM",
+      "related_route_id": 1,
+      "description": "Candidate corridor significantly overlaps an existing active route."
+    }
+  ],
+  "resolved_conflicts": [
+    {
+      "conflict_id": 1,
+      "status": "PROPOSED_RESOLUTION",
+      "resolution_note": "Reassigned Duty 3 to reserve driver Dinesh (ID 4) to fulfill required rest interval."
+    },
+    {
+      "conflict_id": 2,
+      "status": "PROPOSED_RESOLUTION",
+      "resolution_note": "Reassigned Duty 7 to unutilized Bus 5 (TN38AB1005) to eliminate bus double booking."
+    },
+    {
+      "conflict_id": 3,
+      "status": "PROPOSED_RESOLUTION",
+      "resolution_note": "Reassigned Duty 3 to reserve driver Dinesh (ID 4) to eliminate duty overlap."
+    },
+    {
+      "conflict_id": 4,
+      "status": "PROPOSED_RESOLUTION",
+      "resolution_note": "Reassigned Duty 5 to driver Bala (ID 2) who meets route qualification requirements for CBE05."
+    },
+    {
+      "conflict_id": 5,
+      "status": "PROPOSED_RESOLUTION",
+      "resolution_note": "Assigned driver Jagan (ID 10) to unassigned relief Duty 9 on Route 9."
+    }
+  ]
+}

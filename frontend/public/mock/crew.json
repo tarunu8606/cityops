@@ -1,0 +1,86 @@
+[
+  {
+    "crew_id": 1,
+    "name": "Arun",
+    "role": "DRIVER",
+    "license_type": "HEAVY_MOTOR",
+    "qualified_routes": ["CBE01", "CBE02", "CBE03", "CBE04"],
+    "utilization_pct": 72.0,
+    "last_duty": {
+      "route_code": "CBE01",
+      "start_time": "2026-09-01T05:30:00",
+      "end_time": "2026-09-01T09:30:00",
+      "status": "COMPLETED"
+    }
+  },
+  {
+    "crew_id": 2,
+    "name": "Bala",
+    "role": "DRIVER",
+    "license_type": "HEAVY_MOTOR",
+    "qualified_routes": ["CBE01", "CBE05", "CBE07"],
+    "utilization_pct": 55.0,
+    "last_duty": {
+      "route_code": "CBE02",
+      "start_time": "2026-09-01T06:00:00",
+      "end_time": "2026-09-01T10:00:00",
+      "status": "IN_PROGRESS"
+    }
+  },
+  {
+    "crew_id": 3,
+    "name": "Chandran",
+    "role": "DRIVER",
+    "license_type": "HEAVY_MOTOR",
+    "qualified_routes": ["CBE02", "CBE06", "CBE08"],
+    "utilization_pct": 68.0,
+    "last_duty": {
+      "route_code": "CBE03",
+      "start_time": "2026-09-01T06:30:00",
+      "end_time": "2026-09-01T10:30:00",
+      "status": "IN_PROGRESS"
+    }
+  },
+  {
+    "crew_id": 4,
+    "name": "Dinesh",
+    "role": "DRIVER",
+    "license_type": "HEAVY_MOTOR",
+    "qualified_routes": ["CBE03", "CBE04", "CBE08"],
+    "utilization_pct": 41.0,
+    "last_duty": {
+      "route_code": "CBE04",
+      "start_time": "2026-09-01T07:00:00",
+      "end_time": "2026-09-01T11:00:00",
+      "status": "SCHEDULED"
+    }
+  },
+  {
+    "crew_id": 10,
+    "name": "Jagan",
+    "role": "DRIVER",
+    "license_type": "HEAVY_MOTOR",
+    "qualified_routes": ["CBE03", "CBE04", "CBE09"],
+    "utilization_pct": 39.0,
+    "last_duty": {
+      "route_code": "CBE10",
+      "start_time": "2026-09-01T11:00:00",
+      "end_time": "2026-09-01T15:00:00",
+      "status": "SCHEDULED"
+    }
+  },
+  {
+    "crew_id": 11,
+    "name": "Karthik",
+    "role": "DRIVER",
+    "license_type": "HEAVY_MOTOR",
+    "qualified_routes": ["CBE01", "CBE02", "CBE07"],
+    "utilization_pct": 76.0,
+    "last_duty": {
+      "route_code": "CBE07",
+      "start_time": "2026-09-01T08:30:00",
+      "end_time": "2026-09-01T12:30:00",
+      "status": "SCHEDULED"
+    }
+  }
+]
