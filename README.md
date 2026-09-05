@@ -1,6 +1,6 @@
 # CityOps
 
-**Smart scheduling and route management for a city bus network — built in a 15-hour hackathon, with a hard rule: no AI model is ever allowed to be the source of truth for a number.**
+**Smart scheduling and route management for a city bus network — built in a 24-hour hackathon, with a hard rule: no AI model is ever allowed to be the source of truth for a number.**
 
 Coimbatore's synthetic transit network (38 stops, 160 road segments, 10 routes, 26 crew, 16 buses) gets a route-recommendation engine, a crew-conflict resolver, and a live map/simulation frontend — with two LLMs doing the reasoning and exactly zero arithmetic.
 
