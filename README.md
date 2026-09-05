@@ -145,4 +145,4 @@ npm install
 npm run dev   # http://localhost:3000
 ```
 
-Full architecture notes, schema details, and the phase-by-phase build log live in [`CLAUDE.md`](CLAUDE.md).
+Full architecture notes, schema details, and the phase-by-phase build log live in [`CLAUDE.md`](CLAUDE.md). The exact arithmetic behind every score — overlap %, coverage gain, `route_score`, and how a recommendation is actually concluded — is in [`FORMULAS.md`](FORMULAS.md).
